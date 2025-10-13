@@ -31,11 +31,14 @@ public abstract class Zona {
 
     // Getter
     public int getProfundidadMin() { 
-        return profundidadMin; }
+        return profundidadMin; 
+    }
     public int getProfundidadMax() {
-         return profundidadMax; }
+        return profundidadMax; 
+    }
     public EnumSet<ItemTipo> getRecursos() { 
-        return recursos; } 
+        return recursos; 
+    } 
     
     // Método utilitario para O2 (aunque la lógica de la fórmula se puede poner en Main)
     public double calcularProfundidadNormalizada(int z) {

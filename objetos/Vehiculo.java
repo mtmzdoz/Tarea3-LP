@@ -19,5 +19,6 @@ public abstract class Vehiculo {
         // Implementación se hará más adelante.
     }
     //Getter
-    public List<Item> getBodega() { return bodega; }
+    public List<Item> getBodega() { 
+        return bodega; }
 }
