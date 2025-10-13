@@ -15,7 +15,7 @@ public class ZonaProfunda extends Zona {
         super("Zona Profunda", 200, 999, EnumSet.of(ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita));
         this.presion = 10;
     }
-
+    @Override
     public void explorar(Jugador jugador) {
         System.out.println("Explorando en Zona Profunda. ¡Cuidado con la presión!");
     }

@@ -39,7 +39,7 @@ public class NaveExploradora extends Vehiculo implements AccesoProfundidad {
             System.out.println("Módulo instalado. Profundidad soportada: " + this.profundidadSoportada + "m.");
         }
     }
-
+    @Override
     // Implementación del método de la interfaz AccesoProfundidad.
     public boolean puedeAcceder(int requerido) {
         return requerido <= this.profundidadSoportada;

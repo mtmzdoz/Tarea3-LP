@@ -32,7 +32,7 @@ public class Jugador implements AccesoProfundidad {
         this.trajeTermico = false;
         this.mejoraTanque = false;
     }
-
+    @Override
     // Implementación del método de la interfaz AccesoProfundidad.
     public boolean puedeAcceder(int requerido) {
         // Lógica simple para la EM: por ahora, asume que a nado se puede.

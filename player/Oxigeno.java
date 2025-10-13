@@ -9,7 +9,7 @@ public class Oxigeno {
     private int capacidadMaxima;    
 
     public Oxigeno() {
-        this.capacidadMaxima = 60;
+        this.capacidadMaxima = 60; //Inicialmente
         this.oxigenoRestante = 60;
     }
 
@@ -21,8 +21,11 @@ public class Oxigeno {
         this.oxigenoRestante = this.capacidadMaxima;
     }
     //Getter
-    public int getOxigenoRestante() { return oxigenoRestante; }
-    public int getCapacidadMaxima() { return capacidadMaxima; }
+    public int getOxigenoRestante() { 
+        return oxigenoRestante; }
+    public int getCapacidadMaxima() { 
+        return capacidadMaxima; }
     //Setter
-    public void setCapacidadMaxima(int capacidadMaxima) { this.capacidadMaxima = capacidadMaxima; }
+    public void setCapacidadMaxima(int capacidadMaxima) { 
+        this.capacidadMaxima = capacidadMaxima; }
 }

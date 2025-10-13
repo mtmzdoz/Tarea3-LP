@@ -16,7 +16,7 @@ public class ZonaArrecife extends Zona {
         super("Zona Arrecife", 0, 199, EnumSet.of(ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre));
         this.piezasTanque = 3;
     }
-
+    @Override
     // Implementación del método abstracto de Zona.
     public void explorar(Jugador jugador) {
         // Implementación de la lógica de O2 y Loot para la EM (10 pts)

@@ -11,7 +11,7 @@ public class NaveEstrellada extends Zona {
         super("Nave Estrellada", 0, 0, EnumSet.noneOf(ItemTipo.class)); 
         this.moduloEncontrado = false;
     }
-
+    @Override
     public void explorar(Jugador jugador) {
         System.out.println("Explorando el interior de la Nave Estrellada...");
     }
