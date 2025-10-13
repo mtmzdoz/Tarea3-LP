@@ -10,7 +10,8 @@ public abstract class Zona {
     public String nombre; 
     private int profundidadMin;            
     private int profundidadMax;            
-    private EnumSet<ItemTipo> recursos;    
+    private EnumSet<ItemTipo> recursos;  
+    public abstract Zona getZonaSiguiente();  
 
     //Constructor
     public Zona(String nombre, int min, int max, EnumSet<ItemTipo> recursosDisponibles) {
@@ -20,7 +21,6 @@ public abstract class Zona {
         this.recursos = recursosDisponibles;
     }
 
-    // Método concreto: no requiere implementación en subclases.
     public void entrar(Jugador jugador) {
         jugador.setZonaActual(this);
         System.out.println("El jugador ha entrado en " + this.nombre);
@@ -36,6 +36,7 @@ public abstract class Zona {
     public int getProfundidadMax() {
         return profundidadMax; 
     }
+    
     public EnumSet<ItemTipo> getRecursos() { 
         return recursos; 
     } 

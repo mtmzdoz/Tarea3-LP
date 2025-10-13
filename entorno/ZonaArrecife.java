@@ -10,11 +10,19 @@ import java.util.Random;
  */
 public class ZonaArrecife extends Zona {
     
-    private int piezasTanque; 
+    private int piezasTanque;
+    private Random rand; 
+    private Zona siguienteZona;
 
     public ZonaArrecife() {
         super("Zona Arrecife", 0, 199, EnumSet.of(ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre));
         this.piezasTanque = 3;
+        this.rand = new Random();
+        this.siguienteZona = new ZonaProfunda();
+    }
+    @Override
+    public Zona getZonaSiguiente() {
+        return new ZonaProfunda(); // la zona que sigue
     }
     @Override
     // Implementación del método abstracto de Zona.
@@ -23,17 +31,18 @@ public class ZonaArrecife extends Zona {
         
         int z = jugador.getProfundidadActual();
         double d = calcularProfundidadNormalizada(z);
+
+        // Presión (Arrecife = 0)
+        double pres = jugador.getMejoraTanque() ? 0 : 0;
         
-        // 1. Calcular Costo de O2 (C_explorar(d) simplificado)
-        double costo = 12 + 10 * d; // pres(d) es 0 en Arrecife
-        int costoO2 = (int) Math.ceil(costo);
+        // 1. Calcular Costo de O2
+        int costoO2 = (int) Math.ceil(12 + 10*d + pres);
         jugador.getTanqueOxigeno().consumirO2(costoO2);
         
         System.out.println("Explorando en Arrecife a " + z + "m. Costo O2: " + costoO2);
 
         // 2. Sortear PIEZA_TANQUE (30%, stock 3)
-        Random rand = new Random();
-        if (piezasTanque > 0 && rand.nextDouble() < 0.30) {
+        if (piezasTanque > 0 && rand.nextDouble() < 0.3) {
             System.out.println("¡Encontraste una PIEZA_TANQUE!");
             // (PENDIENTE: añadir al inventario)
             piezasTanque--;

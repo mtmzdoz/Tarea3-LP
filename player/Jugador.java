@@ -12,6 +12,7 @@ import entorno.Zona;
  */
 public class Jugador implements AccesoProfundidad {
     
+    //Del diagrama
     private Oxigeno tanqueOxigeno;             
     private List<Item> inventario;             
     private Zona zonaActual;                   
@@ -33,7 +34,7 @@ public class Jugador implements AccesoProfundidad {
         this.mejoraTanque = false;
     }
     @Override
-     //Del diagrama
+    //Del diagrama
     public boolean puedeAcceder(int requerido) {
         // Lógica simple para la EM: por ahora, asume que a nado se puede.
         return true; 
@@ -41,7 +42,7 @@ public class Jugador implements AccesoProfundidad {
 
     //Del diagrama
     public void verEstadoJugador() {
-        System.out.println("Estado del Jugador | O2: " + tanqueOxigeno.getOxigenoRestante() + " | Zona: " + zonaActual.nombre + " | Profundidad: " + profundidadActual + "m");
+        System.out.println("Zona Actual: " + zonaActual.nombre + " | O2: " + tanqueOxigeno.getOxigenoRestante() + " | Profundidad: " + profundidadActual + "m");
     }
     
     // Getter 
@@ -65,6 +66,24 @@ public class Jugador implements AccesoProfundidad {
         return mejoraTanque; 
     } 
 
+    //Creados
+    public void viajarAZona(Zona nuevaZona) {
+        if (nuevaZona == null) {
+            System.out.println("La zona destino es nula. No se puede viajar.");
+            return;
+        }
+
+        System.out.println("Viajando desde " + zonaActual.nombre + " hacia " + nuevaZona.nombre + "...");
+
+        // Cambia la zona
+        setZonaActual(nuevaZona);
+
+        // Reinicia la profundidad al llegar
+        setProfundidadActual(0);
+
+        // Mensaje según si recarga oxígeno
+        
+    }
 
     public void nadar(int metros) {
         // Verificar si puede acceder a esa profundidad (puedes agregar lógica real luego)
@@ -86,24 +105,43 @@ public class Jugador implements AccesoProfundidad {
         System.out.println("Oxígeno restante: " + tanqueOxigeno.getOxigenoRestante() + "/" + tanqueOxigeno.getCapacidadMaxima());
     }
 
-    public void viajarAZona(Zona nuevaZona) {
-        if (nuevaZona == null) {
-            System.out.println("La zona destino es nula. No se puede viajar.");
-            return;
+    public void moverEnProfundidad(int delta) {
+        Zona zona = this.getZonaActual();
+        int nuevaProfundidad = this.profundidadActual;
+        int destino = nuevaProfundidad + delta;
+
+        // Validar límites de la zona
+        if (nuevaProfundidad < zona.getProfundidadMin()) {
+        nuevaProfundidad = zona.getProfundidadMin();
+        }
+        if (nuevaProfundidad > zona.getProfundidadMax()) {
+            nuevaProfundidad = zona.getProfundidadMax();
         }
 
-        System.out.println("Viajando desde " + zonaActual.nombre + " hacia " + nuevaZona.nombre + "...");
+        // Profundidad normalizada
+        double d = zona.calcularProfundidadNormalizada(nuevaProfundidad);
 
-        // Cambia la zona del jugador usando tu setter
-        setZonaActual(nuevaZona);
+        int distanciaRecorrida = Math.abs(destino - nuevaProfundidad);
 
-        // Reinicia la profundidad al llegar
-        setProfundidadActual(0);
+        // Consumo de O2
+        int costoO2 = (int) Math.ceil((3 + 3*d) * Math.abs(distanciaRecorrida) / 50.0);
+        this.tanqueOxigeno.consumirO2(costoO2);
 
-        // Opcional: recargar oxígeno al máximo
-        tanqueOxigeno.recargarCompleto();
+        // Actualizar profundidad
+        this.setProfundidadActual(destino);
 
-        System.out.println("Has llegado a " + nuevaZona.nombre + ". Oxígeno recargado al máximo (" + tanqueOxigeno.getCapacidadMaxima() + ").");
+        System.out.println("Te moviste a " + destino + " m. Oxígeno consumido: " + costoO2 + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante() + "\n");
     }
+
+    private boolean enNave = false;
+
+    public void setEnNave(boolean enNave) {
+        this.enNave = enNave;
+    }
+
+    public boolean isEnNave() {
+        return enNave;
+    }
+
 
 }

@@ -15,26 +15,168 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        NaveEstrellada ZonaInicial = new NaveEstrellada();
-        NaveExploradora Nave = new NaveExploradora();
         ZonaVolcanica ZonaVolcanica = new ZonaVolcanica();
         ZonaArrecife ZonaArrecife = new ZonaArrecife();
         ZonaProfunda ZonaProfunda = new ZonaProfunda();
-        Jugador jugador = new Jugador(Nave, ZonaInicial);
+        NaveEstrellada NaveEstrellada = new NaveEstrellada();
+        NaveExploradora Nave = new NaveExploradora(ZonaArrecife);
+        Jugador jugador = new Jugador(Nave, NaveEstrellada);
 
+        Scanner Scan = new Scanner(System.in); //para los inputs
+        boolean jugando = true;
+
+        System.out.println("=== Inicio del juego ===");
+        while (jugando){
+            jugador.verEstadoJugador();
+
+            if (jugador.getZonaActual() instanceof NaveEstrellada){
+                System.out.println("1) Ir a Zona Arrecife");
+                System.out.println("0) Salir");
+                System.out.print("> ");
+                int opcion = Scan.nextInt();
+
+                switch (opcion) {
+                    case 1:
+                        jugador.setZonaActual(ZonaArrecife);
+                        jugador.setProfundidadActual(0);
+                        System.out.println("=== Has llegado a Zona Arrecife ===");
+                        break;
+
+                    case 0:
+                        System.out.println("Saliendo del juego...");
+                        jugando = false;
+                        break;
+
+                    default:
+                        System.out.println("Opción inválida. Intenta de nuevo.");
+                }
     
-        jugador.verEstadoJugador();
+            }else{
+                System.out.println("1) Subir o descender en profundidad (a nado)");
+                System.out.println("2) Explorar");
+                System.out.println("3) Recoger recursos");
+                System.out.println("4) Volver a la Nave Exploradora");
+                System.out.println("5) Ver profundidad actual");
+                System.out.println("6) Ver oxígeno restante");
+                System.out.println("7) Ver inventario");
+                if (jugador.getZonaActual() instanceof ZonaArrecife){
+                    System.out.println("8) Volver a Nave Estrellada");
+                }
+                System.out.println("0) Salir");
+                System.out.print("> ");
 
-        System.out.println("\n--- Estado inicial ---");
-        jugador.verEstadoJugador();
+                int opcion = Scan.nextInt();
 
-        System.out.println("\n--- Movimiento a nado ---");
-        jugador.nadar(50);
-        jugador.verEstadoJugador();
+                switch (opcion) {
+                    case 1:
+                        System.out.print("Indica profundidad destino (rango zona " + jugador.getZonaActual().getProfundidadMin() + "-" + jugador.getZonaActual().getProfundidadMax() + " m):\n> ");
+                        int destino = Scan.nextInt();
+                        int deltaZ = destino - jugador.getProfundidadActual();
+                        jugador.moverEnProfundidad(deltaZ);
+                        break;
 
-        System.out.println("\n--- Viaje a la Zona Volcánica ---");
-        jugador.viajarAZona(ZonaVolcanica);
-        jugador.verEstadoJugador();
+                    case 2:
+                        jugador.getZonaActual().explorar(jugador);
+                        break;
+
+                    case 3:
+                        System.out.println("Función de recolectar aún no implementada.");
+                        break;
+
+                    case 4:
+                        NaveExploradora nave = jugador.getNave();
+                        nave.setZonaActual(jugador.getZonaActual()); // La nave se ubica en la zona actual
+                        nave.entrar(jugador); // Recarga O2 y posiciona jugador en profundidad de anclaje
+
+                        boolean enNave = true;
+                        while (enNave) {
+                        System.out.println("=== Menú Nave Exploradora ===");
+                        System.out.println("1) Ajustar profundidad de nave (anclaje)");
+                        System.out.println("2) Crear objetos");
+                        System.out.println("3) Guardar TODOS los objetos del jugador en la nave");
+                        System.out.println("4) Moverse a otra zona ");
+                        System.out.println("5) Ver inventario de la nave");
+                        System.out.println("6) Salir de la nave (volver al agua en el anclaje)");
+                        System.out.print("> ");
+                        int opcionNave = Scan.nextInt();
+
+                        switch (opcionNave) {
+                            case 1:
+                                nave.setProfundidadAnclaje(jugador.getProfundidadActual());
+                                System.out.println("Nuevo anclaje establecido en " + jugador.getProfundidadActual() + " m.");
+                                break;
+                            case 2:
+                                System.out.println("Funcionalidad de crear objetos (pendiente de implementar).");
+                                break;
+                            case 3:
+                                System.out.println("Funcionalidad de gestionar inventario (pendiente).");
+                                break;
+                            case 4:
+                                Zona siguienteZona = jugador.getZonaActual().getZonaSiguiente();
+                                if (siguienteZona != null) {
+                                    int minProf = siguienteZona.getProfundidadMin();
+                                    if (jugador.puedeAcceder(minProf) || nave.puedeAcceder(minProf)) {
+                                        jugador.setZonaActual(siguienteZona);
+                                        nave.setZonaActual(siguienteZona);
+                                        nave.setProfundidadAnclaje(minProf);
+                                        jugador.setProfundidadActual(minProf);
+                                        System.out.println("Viajando a " + siguienteZona.nombre + " ...");
+                                        System.out.println("Destino alcanzado. (" + siguienteZona.nombre + ", anclaje="+ minProf + ").\n");
+                                    } else {
+                                        System.out.println("No puedes acceder a esta zona aún (profundidad mínima " + minProf + " m).");
+                                    }
+                                } else {
+                                    System.out.println("No hay zona siguiente.");
+                                }
+                                 break;
+                            case 5:
+                                System.out.println("Inventario de la nave (pendiente).");
+                                break;
+                            case 6:
+                                nave.salir(jugador);
+                                enNave = false;
+                                break;
+                            default:
+                                System.out.println("Opción inválida.");
+                            }
+                        }
+                        break;
+
+                    case 5:
+                        System.out.println("Profundidad actual: " + jugador.getProfundidadActual() + " m");
+                        break;
+
+                    case 6:
+                        System.out.println("Oxígeno restante: " + jugador.getTanqueOxigeno().getOxigenoRestante());
+                        break;
+
+                    case 7:
+                        System.out.println("Inventario (pendiente de implementación): " + jugador.getZonaActual().nombre);
+                        break;
+
+                    case 8:
+                        if (jugador.getZonaActual() instanceof ZonaArrecife) {
+                            jugador.setZonaActual(NaveEstrellada);
+                            jugador.setProfundidadActual(0);
+                            System.out.println("=== Has regresado a la Nave Estrellada ===");
+                        } else {
+                            System.out.println("Opción inválida."); // evita cambiar zona si no corresponde
+                        }
+                        break;
+                    case 0:
+                        System.out.println("Saliendo del juego...");
+                        jugando = false;
+                        break;
+
+                    default:
+                        System.out.println("Opción inválida. Intenta de nuevo.");
+                }
+            }
+        }
+
+        Scan.close();
+        
+    
     }
 }
 
