@@ -11,7 +11,7 @@ public abstract class Zona {
     private int profundidadMin;            
     private int profundidadMax;            
     private EnumSet<ItemTipo> recursos;  
-    public abstract Zona getZonaSiguiente();  
+    protected Zona siguienteZona;  
 
     //Constructor
     public Zona(String nombre, int min, int max, EnumSet<ItemTipo> recursosDisponibles) {
@@ -45,5 +45,11 @@ public abstract class Zona {
     public double calcularProfundidadNormalizada(int z) {
         double divisor = Math.max(1, this.profundidadMax - this.profundidadMin);
         return (double) (z - this.profundidadMin) / divisor;
+    }
+    public Zona getZonaSiguiente() {
+        return siguienteZona; // la zona que sigue
+    }
+    public void setZonaSiguiente(Zona siguienteZona) {
+        this.siguienteZona = siguienteZona;
     }
 }

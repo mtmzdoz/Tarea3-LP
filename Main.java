@@ -22,6 +22,11 @@ public class Main {
         NaveExploradora Nave = new NaveExploradora(ZonaArrecife);
         Jugador jugador = new Jugador(Nave, NaveEstrellada);
 
+        NaveEstrellada.setZonaSiguiente(ZonaArrecife);
+        ZonaArrecife.setZonaSiguiente(ZonaProfunda);
+        ZonaProfunda.setZonaSiguiente(ZonaVolcanica);
+        ZonaVolcanica.setZonaSiguiente(null);
+
         Scanner Scan = new Scanner(System.in); //para los inputs
         boolean jugando = true;
 

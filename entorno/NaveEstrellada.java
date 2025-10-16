@@ -6,6 +6,7 @@ import java.util.EnumSet;
 
 public class NaveEstrellada extends Zona {
     private boolean moduloEncontrado; 
+    private Zona siguienteZona;
 
     public NaveEstrellada() {
         super("Nave Estrellada", 0, 0, EnumSet.noneOf(ItemTipo.class)); 
@@ -15,5 +16,7 @@ public class NaveEstrellada extends Zona {
     public void explorar(Jugador jugador) {
         System.out.println("Explorando el interior de la Nave Estrellada...");
     }
+
+   
 }
 

@@ -12,18 +12,15 @@ public class ZonaArrecife extends Zona {
     
     private int piezasTanque;
     private Random rand; 
-    private Zona siguienteZona;
+    
 
     public ZonaArrecife() {
         super("Zona Arrecife", 0, 199, EnumSet.of(ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre));
         this.piezasTanque = 3;
         this.rand = new Random();
-        this.siguienteZona = new ZonaProfunda();
+        this.siguienteZona = null; 
     }
-    @Override
-    public Zona getZonaSiguiente() {
-        return new ZonaProfunda(); // la zona que sigue
-    }
+    
     @Override
     // Implementación del método abstracto de Zona.
     public void explorar(Jugador jugador) {
@@ -61,4 +58,6 @@ public class ZonaArrecife extends Zona {
     //Setter
     public void setPiezasTanque(int piezasTanque) {
          this.piezasTanque = piezasTanque; }
+
+   
 }

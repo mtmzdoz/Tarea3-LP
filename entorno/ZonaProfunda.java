@@ -10,10 +10,12 @@ import java.util.EnumSet;
 public class ZonaProfunda extends Zona {
     
     private int presion; 
+    private Zona siguienteZona;
 
     public ZonaProfunda() {
         super("Zona Profunda", 200, 999, EnumSet.of(ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita));
         this.presion = 10;
+        this.siguienteZona = null;
     }
     @Override
     public void explorar(Jugador jugador) {
@@ -21,4 +23,6 @@ public class ZonaProfunda extends Zona {
     }
     //Getter
     public int getPresion() { return presion; }
+
+    
 }

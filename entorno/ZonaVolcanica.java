@@ -6,6 +6,8 @@ import java.util.EnumSet;
 
 public class ZonaVolcanica extends Zona {
     private boolean planoEncontrado; 
+    private Zona siguienteZona;
+    
 
     public ZonaVolcanica() {
         super("Zona Volcánica", 1000, 1500, EnumSet.of(ItemTipo.Titanio, ItemTipo.Sulfuro, ItemTipo.Uranio));
