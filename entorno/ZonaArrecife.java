@@ -13,7 +13,7 @@ public class ZonaArrecife extends Zona {
     private int piezasTanque;
     private Random rand; 
     
-
+    //Constructor
     public ZonaArrecife() {
         super("Zona Arrecife", 0, 199, EnumSet.of(ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre));
         this.piezasTanque = 3;
@@ -53,11 +53,13 @@ public class ZonaArrecife extends Zona {
         }
     }
     //Getter
-    public int getPiezasTanque() {
-         return piezasTanque; }
+    public int getPiezasTanque(){
+        return piezasTanque;
+    }
     //Setter
-    public void setPiezasTanque(int piezasTanque) {
-         this.piezasTanque = piezasTanque; }
+    public void setPiezasTanque(int piezasTanque){
+        this.piezasTanque = piezasTanque; 
+    }
 
    
 }

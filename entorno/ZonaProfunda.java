@@ -1,8 +1,10 @@
 package entorno;
 
 import player.Jugador;
+import objetos.NaveExploradora;
 import objetos.ItemTipo;
 import java.util.EnumSet;
+
 
 /**
  * Zona Profunda (200-999 m).
@@ -10,7 +12,6 @@ import java.util.EnumSet;
 public class ZonaProfunda extends Zona {
     
     private int presion; 
-    private Zona siguienteZona;
 
     public ZonaProfunda() {
         super("Zona Profunda", 200, 999, EnumSet.of(ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita));
@@ -20,9 +21,22 @@ public class ZonaProfunda extends Zona {
     @Override
     public void explorar(Jugador jugador) {
         System.out.println("Explorando en Zona Profunda. ¡Cuidado con la presión!");
+        
+
     }
+    public double calcularPresion(Jugador jugador) {
+        if (jugador.getMejoraTanque()) {
+            return 0;
+        }
+        // Calcula profundidad normalizada d (0 a 1)
+        double d = calcularProfundidadNormalizada(jugador.getProfundidadActual());
+        return presion + 6 * d; // fórmula de presión para ZonaProfunda
+    }
+
     //Getter
-    public int getPresion() { return presion; }
+    public int getPresion(){ 
+        return presion; 
+    }
 
     
 }

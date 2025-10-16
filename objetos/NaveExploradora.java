@@ -14,7 +14,14 @@ public class NaveExploradora extends Vehiculo implements AccesoProfundidad {
     @Override
     // Implementación del método de la interfaz AccesoProfundidad.
     public boolean puedeAcceder(int requerido) {
-        return requerido <= this.profundidadSoportada;
+        if (moduloInstalado != null) {
+            return true;
+        }
+    
+        // Sin módulo, solo se permite hasta 500 m
+         return requerido <= 500;
+        
+        
     }
 
     public class ModuloProfundidad { 
@@ -66,6 +73,11 @@ public class NaveExploradora extends Vehiculo implements AccesoProfundidad {
     public Zona getZonaActual() {
         return ZonaActual;
     }
+    // Getter para el módulo instalado
+    public ModuloProfundidad getModuloInstalado() {
+        return moduloInstalado;
+    }
+
     //Setter
     public void setZonaActual(Zona Zona) {
         this.ZonaActual = Zona;

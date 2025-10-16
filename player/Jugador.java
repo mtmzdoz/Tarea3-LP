@@ -6,6 +6,9 @@ import objetos.Item;
 import objetos.AccesoProfundidad;
 import objetos.NaveExploradora;
 import entorno.Zona;
+import entorno.ZonaProfunda;
+import entorno.ZonaVolcanica;
+
 
 /**
  * Clase que representa al jugador. Implementa AccesoProfundidad.
@@ -123,16 +126,26 @@ public class Jugador implements AccesoProfundidad {
 
         int distanciaRecorrida = Math.abs(destino - nuevaProfundidad);
 
+        
+
+        double presion = 0;
+        if (!this.mejoraTanque) {
+            if (zona instanceof ZonaProfunda) {
+                presion = ((ZonaProfunda) zona).calcularPresion(this); // devuelve 10 + 6*d
+            } else if (zona instanceof ZonaVolcanica) {
+                System.out.println("⚠️ No se puede descender a Zona Volcánica sin el módulo de profundidad!");
+                return;
+            }
+        }
         // Consumo de O2
-        int costoO2 = (int) Math.ceil((3 + 3*d) * Math.abs(distanciaRecorrida) / 50.0);
+        int costoO2 = (int) Math.ceil((3 + 3*d) * Math.abs(distanciaRecorrida) / 50.0 );
         this.tanqueOxigeno.consumirO2(costoO2);
 
         // Actualizar profundidad
         this.setProfundidadActual(destino);
 
-        System.out.println("Te moviste a " + destino + " m. Oxígeno consumido: " + costoO2 + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante() + "\n");
+        System.out.println("Te moviste a " + destino + " m. Presión:" + presion + " | Oxígeno consumido: " + costoO2 + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante());
     }
-
     private boolean enNave = false;
 
     public void setEnNave(boolean enNave) {

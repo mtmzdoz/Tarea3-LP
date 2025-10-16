@@ -108,7 +108,19 @@ public class Main {
                         switch (opcionNave) {
                             case 1:
                                 nave.setProfundidadAnclaje(jugador.getProfundidadActual());
-                                System.out.println("Nuevo anclaje establecido en " + jugador.getProfundidadActual() + " m.");
+                                System.out.println("Ingresa la nueva profundidad de anclaje (" + nave.getZonaActual().getProfundidadMin() + "-" + nave.getZonaActual().getProfundidadMax() + " m): ");
+                                int nuevoAnclaje = Scan.nextInt();
+
+                                // Validar que esté dentro del rango
+                                if (nuevoAnclaje < nave.getZonaActual().getProfundidadMin() || nuevoAnclaje > nave.getZonaActual().getProfundidadMax()) {
+                                    System.out.println("Profundidad inválida para esta zona.");
+                                } else if (nuevoAnclaje > 500 && nave.getModuloInstalado() == null) {
+                                    // Restricción de 500 m sin módulo
+                                    System.out.println("No puedes anclar la nave por encima de 500 m sin módulo de profundidad.");
+                                } else {
+                                    nave.setProfundidadAnclaje(nuevoAnclaje);
+                                    System.out.println("Nuevo anclaje establecido en " + nuevoAnclaje + " m.");
+                                }
                                 break;
                             case 2:
                                 System.out.println("Funcionalidad de crear objetos (pendiente de implementar).");
@@ -120,7 +132,7 @@ public class Main {
                                 Zona siguienteZona = jugador.getZonaActual().getZonaSiguiente();
                                 if (siguienteZona != null) {
                                     int minProf = siguienteZona.getProfundidadMin();
-                                    if (jugador.puedeAcceder(minProf) || nave.puedeAcceder(minProf)) {
+                                    if (jugador.puedeAcceder(minProf) && nave.puedeAcceder(minProf)) {
                                         jugador.setZonaActual(siguienteZona);
                                         nave.setZonaActual(siguienteZona);
                                         nave.setProfundidadAnclaje(minProf);

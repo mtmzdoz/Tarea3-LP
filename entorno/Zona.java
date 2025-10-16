@@ -29,6 +29,11 @@ public abstract class Zona {
     // Método ABSTRACTO: OBLIGA a todas las subclases a tener un método explorar.
     public abstract void explorar(Jugador jugador);
 
+     // Método utilitario para O2 (aunque la lógica de la fórmula se puede poner en Main)
+    public double calcularProfundidadNormalizada(int z) {
+        double divisor = Math.max(1, this.profundidadMax - this.profundidadMin);
+        return (double) (z - this.profundidadMin) / divisor;
+    }
     // Getter
     public int getProfundidadMin() { 
         return profundidadMin; 
@@ -41,13 +46,8 @@ public abstract class Zona {
         return recursos; 
     } 
     
-    // Método utilitario para O2 (aunque la lógica de la fórmula se puede poner en Main)
-    public double calcularProfundidadNormalizada(int z) {
-        double divisor = Math.max(1, this.profundidadMax - this.profundidadMin);
-        return (double) (z - this.profundidadMin) / divisor;
-    }
     public Zona getZonaSiguiente() {
-        return siguienteZona; // la zona que sigue
+        return siguienteZona; 
     }
     public void setZonaSiguiente(Zona siguienteZona) {
         this.siguienteZona = siguienteZona;
