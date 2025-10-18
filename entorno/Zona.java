@@ -3,6 +3,7 @@ package entorno;
 import player.Jugador;
 import objetos.ItemTipo;
 import java.util.EnumSet;
+import java.util.Scanner;
 
 
 public abstract class Zona {
@@ -29,6 +30,9 @@ public abstract class Zona {
 
     // Método ABSTRACTO: OBLIGA a todas las subclases a tener un método explorar.
     public abstract void explorar(Jugador jugador);
+
+    public abstract void recolectar(Jugador jugador, Scanner scan);
+
 
      // Método utilitario para O2 (aunque la lógica de la fórmula se puede poner en Main)
     public double calcularProfundidadNormalizada(int z) {

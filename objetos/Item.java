@@ -1,5 +1,6 @@
 package objetos;
 
+
 public class Item {
    //privados + / públicos -
     private ItemTipo tipo;
@@ -9,6 +10,12 @@ public class Item {
     public Item(ItemTipo tipo, int cantidad) {
         this.tipo = tipo;
         this.cantidad = cantidad;
+        
+    }
+
+    //Constructor secundario del tipo y agrega +1
+    public Item(ItemTipo tipo) {
+        this(tipo, 1);
     }
 
     // Getter

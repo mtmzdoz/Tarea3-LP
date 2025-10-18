@@ -4,6 +4,7 @@ import player.Jugador;
 import objetos.NaveExploradora;
 import objetos.ItemTipo;
 import java.util.EnumSet;
+import java.util.Scanner;
 
 
 /**
@@ -18,12 +19,19 @@ public class ZonaProfunda extends Zona {
         this.presion = 10;
         this.ZonaSiguiente = null;
     }
+    public void recolectar(Jugador jugador, Scanner scan) {
+        System.out.println("Explorando en Zona Profunda. ¡Cuidado con la presión!");
+        
+
+    }
     @Override
     public void explorar(Jugador jugador) {
         System.out.println("Explorando en Zona Profunda. ¡Cuidado con la presión!");
         
 
     }
+
+
     public double calcularPresion(Jugador jugador) {
         if (jugador.getMejoraTanque()) {
             return 0;

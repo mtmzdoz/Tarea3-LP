@@ -1,13 +1,16 @@
 package player;
 
 import java.util.List;
+import java.util.Scanner;
 import java.util.ArrayList;
 import objetos.Item;
+import objetos.ItemTipo;
 import objetos.AccesoProfundidad;
 import objetos.NaveExploradora;
 import entorno.Zona;
 import entorno.ZonaProfunda;
 import entorno.ZonaVolcanica;
+
 
 
 /**
@@ -37,8 +40,9 @@ public class Jugador implements AccesoProfundidad {
         this.trajeTermico = false;
         this.mejoraTanque = false;
     }
-    @Override
+
     //Del diagrama
+    @Override
     public boolean puedeAcceder(int requerido) {
         Zona zona = this.zonaActual;
 
@@ -61,53 +65,8 @@ public class Jugador implements AccesoProfundidad {
     public void verEstadoJugador() {
         System.out.println("Zona Actual: " + zonaActual.nombre + " | O2: " + tanqueOxigeno.getOxigenoRestante() + " | Profundidad: " + profundidadActual + "m");
     }
-    
-    // Getter 
-    public Oxigeno getTanqueOxigeno() {
-         return tanqueOxigeno; }
-    public Zona getZonaActual() {
-         return zonaActual; }
-    public int getProfundidadActual() {
-         return profundidadActual; }
-    public NaveExploradora getNave() 
-    { return nave; }
 
-    //Setter
-    public void setZonaActual(Zona zonaActual) { 
-        this.zonaActual = zonaActual;
-    }
-    public void setProfundidadActual(int profundidadActual) { 
-        this.profundidadActual = profundidadActual; 
-    }
-    public boolean getMejoraTanque() {
-        return mejoraTanque; 
-    } 
-
-    //Creados
-    public void viajarAZona(Zona nuevaZona) {
-        if (nuevaZona == null) {
-            System.out.println("La zona destino es nula. No se puede viajar.");
-            return;
-        }
-
-        System.out.println("Viajando desde " + zonaActual.nombre + " hacia " + nuevaZona.nombre + "...");
-
-        // Cambia la zona
-        setZonaActual(nuevaZona);
-
-        // Reinicia la profundidad al llegar
-        setProfundidadActual(0);
-
-        // Mensaje según si recarga oxígeno
-        
-    }
-
-    public void nadar(int metros) {
-        int delta = metros - this.profundidadActual;
-        moverEnProfundidad(delta);
-    }
-
-    public void moverEnProfundidad(int delta) {
+    public void nadar(int delta) {
         Zona zona = this.getZonaActual();
         int profundidadInicial = this.profundidadActual;
         int destino = this.profundidadActual + delta;
@@ -128,8 +87,6 @@ public class Jugador implements AccesoProfundidad {
         double d = zona.calcularProfundidadNormalizada(profundidadInicial);
         int distanciaRecorrida = Math.abs(destino - profundidadInicial);
 
-        
-
         double presion = 0;
         if (!this.mejoraTanque) {
             if (zona instanceof ZonaProfunda) {
@@ -140,23 +97,122 @@ public class Jugador implements AccesoProfundidad {
             }
         }
         // Consumo de O2
-        int costoO2 = (int) Math.ceil((3 + 3*d) * Math.abs(distanciaRecorrida) / 50.0 );
-        this.tanqueOxigeno.consumirO2(costoO2);
+        int Cmover = (int) Math.ceil((3 + 3*d) * Math.abs(distanciaRecorrida) / 50.0 );
+        this.tanqueOxigeno.consumirO2(Cmover);
+
+        if (this.getTanqueOxigeno().getOxigenoRestante() <= 0) {
+            this.derrotaPorOxigeno();
+            return; // interrumpe la función inmediatamente
+        }
 
         // Actualizar profundidad
         this.setProfundidadActual(destino);
 
-        System.out.println("Te moviste a " + destino + " m. Presión:" + presion + " | Oxígeno consumido: " + costoO2 + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante());
+        System.out.println("Te moviste a " + destino + " m. Presión:" + presion + " | Oxígeno consumido: " + Cmover + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante());
     }
     
-
-    public void setEnNave(boolean enNave) {
-        this.enNave = enNave;
+    
+    public void agregarItem(Item nuevo) {
+        if (nuevo == null) return;
+        for (Item it : inventario) {
+            if (it.getTipo() == nuevo.getTipo()) {
+                it.setCantidad(it.getCantidad() + nuevo.getCantidad());
+                System.out.println("🎒 Sumado: " + nuevo.getCantidad() + " x " + it.getTipo() + " (total: " + it.getCantidad() + ")");
+                return;
+            }
+        }
+        inventario.add(nuevo);
+        System.out.println("🎒 Agregado: " + nuevo.getCantidad() + " x " + nuevo.getTipo());
     }
 
+    public void verInventario() {
+        if (inventario.isEmpty()) {
+            System.out.println("🎒 Tu inventario está vacío.");
+            return;
+        }
+
+        System.out.println("=== 🎒 Inventario del jugador ===");
+        for (Item item : inventario) {
+            System.out.println("- " + item.getTipo() + " x" + item.getCantidad());
+        }
+    }
+
+    public void derrotaPorOxigeno() {
+        System.out.println("\n💀 ¡Te has quedado sin oxígeno!");
+        System.out.println("Pierdes todo tu inventario y reapareces en la nave...\n");
+
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE);
+
+        // Reaparecer en la nave
+        this.zonaActual = nave.getZonaActual(); 
+        this.profundidadActual = nave.getProfundidadAnclaje();
+        this.tanqueOxigeno.recargarCompleto();
+        this.enNave = true;
+        nave.entrar(this);
+
+        nave.MenuNave(this, new Scanner(System.in));
+        
+    }
+
+    public void derrotaPorSofocacion() {
+        System.out.println("\n🥵 ¡Has sucumbido al calor extremo dentro de la nave!");
+        System.out.println("Pierdes todo tu inventario y reapareces en la Nave Exploradora...\n");
+
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE);
+
+        this.zonaActual = nave.getZonaActual(); 
+        this.profundidadActual = nave.getProfundidadAnclaje();
+        this.tanqueOxigeno.recargarCompleto();
+        nave.entrar(this);
+    }
+
+    // Getters y Setters
+    public Oxigeno getTanqueOxigeno(){
+        return tanqueOxigeno; 
+    }
+    public boolean getMejoraTanque() {
+        return mejoraTanque; 
+    }
+    public Zona getZonaActual() {
+        return zonaActual;
+    }
+    public int getProfundidadActual(){
+        return profundidadActual; 
+    }
+    public NaveExploradora getNave(){ 
+        return nave; 
+    }
     public boolean isEnNave() {
         return enNave;
     }
+    public List<Item> getInventario() {
+        return inventario;
+    }
+    // --- Traje térmico ---
+    public boolean isTrajeTermico() {
+        return trajeTermico;
+    }
+
+    
 
 
+    public void setZonaActual(Zona zonaActual) { 
+        this.zonaActual = zonaActual;
+    }
+    public void setProfundidadActual(int profundidadActual) { 
+        this.profundidadActual = profundidadActual; 
+    }
+    public void setEnNave(boolean enNave) {
+        this.enNave = enNave;
+    }
+    public void setTanqueOxigeno(Oxigeno nuevoTanque) {
+        this.tanqueOxigeno = nuevoTanque;
+    }
+
+    public void setMejoraTanque(boolean mejoraTanque) {
+        this.mejoraTanque = mejoraTanque;
+    }
+    public void setTrajeTermico(boolean trajeTermico) {
+        this.trajeTermico = trajeTermico;
+    }
 }

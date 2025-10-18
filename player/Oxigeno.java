@@ -1,5 +1,7 @@
 package player;
 
+
+
 /**
  * Gestiona el oxígeno.
  */
@@ -8,14 +10,24 @@ public class Oxigeno {
     private int oxigenoRestante;    
     private int capacidadMaxima;    
 
+    //Inicialmente
     public Oxigeno() {
-        this.capacidadMaxima = 60; //Inicialmente
+        this.capacidadMaxima = 60; 
         this.oxigenoRestante = 60;
     }
+    //Cuando se mejora capacidad
+    public void duplicarCapacidad() {
+        this.capacidadMaxima *= 2;
+        this.oxigenoRestante = capacidadMaxima;
+    }
+
 
     public void consumirO2(int unidades) {
         this.oxigenoRestante = Math.max(0, this.oxigenoRestante - unidades);
+    
+
     }
+    
 
     public void recargarCompleto() {
         this.oxigenoRestante = this.capacidadMaxima;
