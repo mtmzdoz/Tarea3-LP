@@ -7,6 +7,7 @@ import objetos.Item;
 import objetos.ItemTipo;
 import objetos.AccesoProfundidad;
 import objetos.NaveExploradora;
+import entorno.NaveEstrellada;
 import entorno.Zona;
 import entorno.ZonaProfunda;
 import entorno.ZonaVolcanica;
@@ -141,7 +142,7 @@ public class Jugador implements AccesoProfundidad {
         System.out.println("\n💀 ¡Te has quedado sin oxígeno!");
         System.out.println("Pierdes todo tu inventario y reapareces en la nave...\n");
 
-        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE);
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD);
 
         // Reaparecer en la nave
         this.zonaActual = nave.getZonaActual(); 
@@ -158,12 +159,19 @@ public class Jugador implements AccesoProfundidad {
         System.out.println("\n🥵 ¡Has sucumbido al calor extremo dentro de la nave!");
         System.out.println("Pierdes todo tu inventario y reapareces en la Nave Exploradora...\n");
 
-        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE);
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD);
 
         this.zonaActual = nave.getZonaActual(); 
         this.profundidadActual = nave.getProfundidadAnclaje();
         this.tanqueOxigeno.recargarCompleto();
+        this.enNave = true;
+
+        if (zonaActual instanceof NaveEstrellada naveEstrellada) {
+            naveEstrellada.resetearAccionesSinTraje();
+        }
         nave.entrar(this);
+
+        nave.MenuNave(this, new Scanner(System.in));
     }
 
     // Getters y Setters
@@ -198,6 +206,10 @@ public class Jugador implements AccesoProfundidad {
 
     public void setZonaActual(Zona zonaActual) { 
         this.zonaActual = zonaActual;
+        //Desde o A nave estrellada resetamos por si acaso
+        if (zonaActual instanceof NaveEstrellada naveEstrellada) {
+            naveEstrellada.resetearAccionesSinTraje();
+        }
     }
     public void setProfundidadActual(int profundidadActual) { 
         this.profundidadActual = profundidadActual; 

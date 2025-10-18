@@ -196,26 +196,50 @@ public class NaveExploradora extends Vehiculo implements AccesoProfundidad {
     public void CrearObjetos(Jugador jugador, Scanner scan) {
         System.out.println("=== Mesa de Crafteo ===");
 
+        boolean puedeMejorarTanque = false;
+        boolean puedeInstalarModulo = false;
+
         // ✅ Buscar cuántas piezas tanque tiene el jugador
-        int piezasTanque = 0;
         for (Item item : jugador.getInventario()) {
-            if (item.getTipo() == ItemTipo.PIEZA_TANQUE) {
-                piezasTanque = item.getCantidad();
-                break;
+            if (item.getTipo() == ItemTipo.PIEZA_TANQUE && item.getCantidad() >= 3) {
+                puedeMejorarTanque = true;
+            
+            } else if (item.getTipo() == ItemTipo.MODULO_PROFUNDIDAD) {
+                puedeInstalarModulo = true;
+              
             }
         }
 
         
 
-        if (piezasTanque == 3 && !jugador.getMejoraTanque()) {
-            System.out.println("1) Mejorar tanque (requiere 3 PIEZAS_TANQUE)");
+        if (puedeMejorarTanque || puedeInstalarModulo) {
+            if (puedeMejorarTanque){
+                System.out.println("1) Mejorar tanque (requiere 3 PIEZAS_TANQUE)");
+            }
+            if(puedeInstalarModulo){
+                System.out.println("2) Instalar MODULO_PROFUNDIDAD en la nave");
+            }
             System.out.println("0) Cancelar");
             System.out.print("> ");
             int opcion = scan.nextInt();
 
             switch (opcion) {
                 case 1:
-                    mejorarTanque(jugador);
+                    if (puedeMejorarTanque) {
+                        mejorarTanque(jugador);
+                    } else {
+                        System.out.println("❌ No tienes suficientes PIEZAS_TANQUE.");
+                    }
+                    break;
+                case 2:
+                    if (puedeInstalarModulo) {
+                        ModuloProfundidad modulo = new ModuloProfundidad();
+                        this.instalarModulo(modulo);
+                        jugador.getInventario().removeIf(i -> i.getTipo() == ItemTipo.MODULO_PROFUNDIDAD);
+                        System.out.println("✅ MODULO_PROFUNDIDAD instalado correctamente.");
+                    } else {
+                        System.out.println("❌ No tienes un módulo de profundidad disponible.");
+                    }
                     break;
                 case 0:
                     System.out.println("Creación cancelada.");
