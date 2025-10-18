@@ -13,12 +13,15 @@ import java.util.Scanner;
 public class ZonaArrecife extends Zona {
     
     private int piezasTanque;
+    private int presion;
     private Random rand; 
+    
     
     //Constructor
     public ZonaArrecife() {
         super("Zona Arrecife", 0, 199, EnumSet.of(ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre));
         this.piezasTanque = 3;
+        this.presion = 0;
         this.rand = new Random();
         this.ZonaSiguiente = null; 
     }
@@ -28,8 +31,8 @@ public class ZonaArrecife extends Zona {
         int z = jugador.getProfundidadActual();
         double d = calcularProfundidadNormalizada(z);
 
-        // Presión (Arrecife = 0)
-        double pres = jugador.getMejoraTanque() ? 0 : 0;
+        // Presión en arrecife siempre 0 pero igual usamos formula por si se quiere cambiar 
+        double pres = calcularPresion(jugador);
 
         // 1. Calcular costo de O2
         int Crecolectar = (int) Math.ceil(10 + 6*d + pres);
@@ -92,24 +95,39 @@ public class ZonaArrecife extends Zona {
             return; // interrumpe la función inmediatamente
         }
 
-       otorgarRecompensa(jugador);
+       otorgarRecompensa(jugador,d);
     }
 
-    private void otorgarRecompensa(Jugador jugador){
+    private void otorgarRecompensa(Jugador jugador, double d){
         double probabilidad= rand.nextDouble();
 
         // 2. Sortear PIEZA_TANQUE (30%, stock 3)
         if (piezasTanque > 0 && probabilidad < 0.3) {
             System.out.println("¡Encontraste una PIEZA_TANQUE!");
-            jugador.agregarItem(new Item(ItemTipo.PIEZA_TANQUE));
+            jugador.agregarItem(new Item(ItemTipo.PIEZA_TANQUE, 1));
             piezasTanque--;
         } else {
-            // 3. Recurso aleatorio (max(1, floor(n_min * d)))
+            int n_min = 1;
+            int cantidad = Math.max(1, (int) Math.floor(n_min * d));
+
             ItemTipo[] recursos = {ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre};
             ItemTipo recurso = recursos[rand.nextInt(recursos.length)];
-            jugador.agregarItem(new Item(recurso));
-            System.out.println("🔹 Has recolectado: " + recurso);
+            jugador.agregarItem(new Item(recurso, cantidad));
+            System.out.println("🔹 Has recolectado: " + cantidad + " x " + recurso);
         }
+    }
+
+    public double calcularPresion(Jugador jugador) {
+        if (jugador.getMejoraTanque()) {
+            return 0;
+        }
+        return presion;
+    }
+
+
+    //Getter
+    public int getPresion(){ 
+        return presion; 
     }
 
     //Getter

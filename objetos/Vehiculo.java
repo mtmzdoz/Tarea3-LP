@@ -1,5 +1,6 @@
 package objetos;
 
+import player.Jugador;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -14,9 +15,30 @@ public abstract class Vehiculo {
         this.bodega = new ArrayList<>();
     }
 
-    // El método es CONCRETO, no necesita ser implementado por las subclases (a menos que quieran).
-    public void transferirObjetos(List<Item> origen, List<Item> destino) {
-        // Implementación se hará más adelante.
+    
+    public void transferirObjetos(Jugador jugador) {
+        if (jugador.getInventario().isEmpty()) {
+            System.out.println("🎒 No tienes objetos que guardar.");
+            return;
+        }
+        for (Item itemJugador : jugador.getInventario()) {
+            agregarItem(itemJugador);
+        }
+
+        jugador.getInventario().clear();
+        System.out.println("✅ Todos tus objetos han sido guardados en la bodega.\n");
+         
+    }
+
+    //Se reusa en retirar objetos 
+    private void agregarItem(Item nuevo) {
+        for (Item item : bodega) {
+            if (item.getTipo() == nuevo.getTipo()) {
+                item.setCantidad(item.getCantidad() + nuevo.getCantidad());
+                return;
+            }
+        }
+        bodega.add(new Item(nuevo.getTipo(), nuevo.getCantidad()));
     }
     //Getter
     public List<Item> getBodega() { 

@@ -18,7 +18,7 @@ public enum ItemTipo {
     Sulfuro,
     Uranio,
     
-    //Nave Estrellada (con traje térmico)
+    //Nave Estrellada 
     Cables,
     Piezas_Metal,
 

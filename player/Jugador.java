@@ -126,6 +126,17 @@ public class Jugador implements AccesoProfundidad {
         System.out.println("🎒 Agregado: " + nuevo.getCantidad() + " x " + nuevo.getTipo());
     }
 
+    public void removerItem(ItemTipo tipo, int cantidad) {
+        for (int i = 0; i < inventario.size(); i++) {
+            Item item = inventario.get(i);
+            if (item.getTipo() == tipo) {
+                item.setCantidad(item.getCantidad() - cantidad);
+                if (item.getCantidad() <= 0) inventario.remove(i);
+                return;
+            }
+        }
+    }
+
     public void verInventario() {
         if (inventario.isEmpty()) {
             System.out.println("🎒 Tu inventario está vacío.");
@@ -138,11 +149,14 @@ public class Jugador implements AccesoProfundidad {
         }
     }
 
+    
+
+
     public void derrotaPorOxigeno() {
         System.out.println("\n💀 ¡Te has quedado sin oxígeno!");
         System.out.println("Pierdes todo tu inventario y reapareces en la nave...\n");
 
-        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD);
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD && item.getTipo() != ItemTipo.PLANO_NAVE);
 
         // Reaparecer en la nave
         this.zonaActual = nave.getZonaActual(); 
@@ -159,7 +173,7 @@ public class Jugador implements AccesoProfundidad {
         System.out.println("\n🥵 ¡Has sucumbido al calor extremo dentro de la nave!");
         System.out.println("Pierdes todo tu inventario y reapareces en la Nave Exploradora...\n");
 
-        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD);
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD && item.getTipo() != ItemTipo.PLANO_NAVE);
 
         this.zonaActual = nave.getZonaActual(); 
         this.profundidadActual = nave.getProfundidadAnclaje();
@@ -169,6 +183,22 @@ public class Jugador implements AccesoProfundidad {
         if (zonaActual instanceof NaveEstrellada naveEstrellada) {
             naveEstrellada.resetearAccionesSinTraje();
         }
+        nave.entrar(this);
+
+        nave.MenuNave(this, new Scanner(System.in));
+    }
+
+    public void perdidaConciencia(){
+        System.out.println("\n💫 El calor y los gases te abruman... ¡pierdes la consciencia!");
+            System.out.println("Cuando despiertas, estás de vuelta en la nave... pero has perdido tu inventario.");
+
+        inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD && item.getTipo() != ItemTipo.PLANO_NAVE);
+
+        // Reaparecer en la nave
+        this.zonaActual = nave.getZonaActual(); 
+        this.profundidadActual = nave.getProfundidadAnclaje();
+        this.tanqueOxigeno.recargarCompleto();
+        this.enNave = true;
         nave.entrar(this);
 
         nave.MenuNave(this, new Scanner(System.in));

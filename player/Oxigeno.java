@@ -28,10 +28,14 @@ public class Oxigeno {
 
     }
     
-
     public void recargarCompleto() {
         this.oxigenoRestante = this.capacidadMaxima;
     }
+    public void aumentarCapacidad(int extra) {
+        this.capacidadMaxima += extra;
+        this.oxigenoRestante = this.capacidadMaxima; // Se recarga al máximo automáticamente
+    }
+
     //Getter
     public int getOxigenoRestante() { 
         return oxigenoRestante; }
