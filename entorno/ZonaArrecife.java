@@ -18,7 +18,7 @@ public class ZonaArrecife extends Zona {
         super("Zona Arrecife", 0, 199, EnumSet.of(ItemTipo.Cuarzo, ItemTipo.Silicio, ItemTipo.Cobre));
         this.piezasTanque = 3;
         this.rand = new Random();
-        this.siguienteZona = null; 
+        this.ZonaSiguiente = null; 
     }
     
     @Override

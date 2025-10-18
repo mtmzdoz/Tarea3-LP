@@ -96,7 +96,7 @@ public class NaveExploradora extends Vehiculo implements AccesoProfundidad {
         jugador.setProfundidadActual(profundidadAnclaje);
 
         System.out.println("\n === Nave Exploradora ==="); //BORRAR DEBUG OXIGENO
-        System.out.println("El oxígeno ha sido recargado: " + jugador.getTanqueOxigeno().getOxigenoRestante() + "| Profundidad de anclaje actual: " + profundidadAnclaje + " m\n");
+        System.out.println("El oxígeno ha sido recargado: " + jugador.getTanqueOxigeno().getOxigenoRestante() + " | Profundidad de anclaje actual: " + profundidadAnclaje + " m\n");
     }
 
     // 🔹 Método para salir

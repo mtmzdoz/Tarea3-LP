@@ -23,7 +23,8 @@ public class Jugador implements AccesoProfundidad {
     private boolean tienePlanos;            
     private NaveExploradora nave;                   
     private boolean trajeTermico;              
-    private boolean mejoraTanque;              
+    private boolean mejoraTanque;   
+    private boolean enNave = false;           
 
     //Constructor
     public Jugador(NaveExploradora naveInicial, Zona zonaInicial) {
@@ -39,8 +40,21 @@ public class Jugador implements AccesoProfundidad {
     @Override
     //Del diagrama
     public boolean puedeAcceder(int requerido) {
-        // Lógica simple para la EM: por ahora, asume que a nado se puede.
-        return true; 
+        Zona zona = this.zonaActual;
+
+        // No puede entrar a zonas volcánicas sin traje térmico
+        if (zona instanceof ZonaVolcanica && !trajeTermico) {
+            System.out.println("⚠️ No puedes acceder a la Zona Volcánica sin el traje térmico.");
+            return false;
+        }
+        if (requerido > 500 && !nave.puedeAcceder(requerido)) {
+            System.out.println("⚠️ No puedes acceder más allá de 500 m sin el módulo de profundidad instalado en la nave.");
+            return false;
+        }
+
+        // Sin mejora, solo puede llegar hasta 500 m (igual que la nave sin módulo)
+        return true;
+        
     }
 
     //Del diagrama
@@ -89,42 +103,30 @@ public class Jugador implements AccesoProfundidad {
     }
 
     public void nadar(int metros) {
-        // Verificar si puede acceder a esa profundidad (puedes agregar lógica real luego)
-        if (!puedeAcceder(metros)) {
-            System.out.println("No puedes alcanzar esa profundidad nadando.");
-            return;
-        }
-
-        // Actualiza la profundidad
-        this.profundidadActual = metros;
-
-        // Calcula consumo de oxígeno (ejemplo simple: 1 O2 por cada 10 metros, mínimo 1)
-        int consumo = Math.max(1, metros / 10);
-
-        // Consume oxígeno usando tu clase Oxigeno
-        tanqueOxigeno.consumirO2(consumo);
-
-        System.out.println("El jugador nada hasta " + metros + " metros de profundidad. (-" + consumo + " O2)");
-        System.out.println("Oxígeno restante: " + tanqueOxigeno.getOxigenoRestante() + "/" + tanqueOxigeno.getCapacidadMaxima());
+        int delta = metros - this.profundidadActual;
+        moverEnProfundidad(delta);
     }
 
     public void moverEnProfundidad(int delta) {
         Zona zona = this.getZonaActual();
-        int nuevaProfundidad = this.profundidadActual;
-        int destino = nuevaProfundidad + delta;
+        int profundidadInicial = this.profundidadActual;
+        int destino = this.profundidadActual + delta;
 
-        // Validar límites de la zona
-        if (nuevaProfundidad < zona.getProfundidadMin()) {
-        nuevaProfundidad = zona.getProfundidadMin();
+        if (destino < zona.getProfundidadMin() || destino > zona.getProfundidadMax()) {
+            System.out.println("⚠️ No puedes nadar fuera del rango de esta zona (" + zona.getProfundidadMin() + " - " + zona.getProfundidadMax() + " m).");
+            return;
         }
-        if (nuevaProfundidad > zona.getProfundidadMax()) {
-            nuevaProfundidad = zona.getProfundidadMax();
+
+        // ⚠️ Solo limitamos si es una ZonaVolcanica sin traje térmico
+        if (zona instanceof ZonaVolcanica && !trajeTermico) {
+            System.out.println("⚠️ No puedes nadar en la Zona Volcánica sin el traje térmico.");
+            return;
         }
+
 
         // Profundidad normalizada
-        double d = zona.calcularProfundidadNormalizada(nuevaProfundidad);
-
-        int distanciaRecorrida = Math.abs(destino - nuevaProfundidad);
+        double d = zona.calcularProfundidadNormalizada(profundidadInicial);
+        int distanciaRecorrida = Math.abs(destino - profundidadInicial);
 
         
 
@@ -146,7 +148,7 @@ public class Jugador implements AccesoProfundidad {
 
         System.out.println("Te moviste a " + destino + " m. Presión:" + presion + " | Oxígeno consumido: " + costoO2 + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante());
     }
-    private boolean enNave = false;
+    
 
     public void setEnNave(boolean enNave) {
         this.enNave = enNave;

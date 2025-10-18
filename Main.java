@@ -6,8 +6,7 @@ import entorno.ZonaProfunda;
 import entorno.ZonaVolcanica;
 import entorno.NaveEstrellada;
 
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.Scanner;
 
 
@@ -23,8 +22,14 @@ public class Main {
         Jugador jugador = new Jugador(Nave, NaveEstrellada);
 
         NaveEstrellada.setZonaSiguiente(ZonaArrecife);
+
+        ZonaArrecife.setZonaAnterior(NaveEstrellada);
         ZonaArrecife.setZonaSiguiente(ZonaProfunda);
+        
+        ZonaProfunda.setZonaAnterior(ZonaArrecife);
         ZonaProfunda.setZonaSiguiente(ZonaVolcanica);
+        
+        ZonaVolcanica.setZonaAnterior(ZonaProfunda);
         ZonaVolcanica.setZonaSiguiente(null);
 
         Scanner Scan = new Scanner(System.in); //para los inputs
@@ -60,13 +65,10 @@ public class Main {
                 System.out.println("1) Subir o descender en profundidad (a nado)");
                 System.out.println("2) Explorar");
                 System.out.println("3) Recoger recursos");
-                System.out.println("4) Volver a la Nave Exploradora");
+                System.out.println("4) Entrar a la Nave Exploradora");
                 System.out.println("5) Ver profundidad actual");
                 System.out.println("6) Ver oxígeno restante");
                 System.out.println("7) Ver inventario");
-                if (jugador.getZonaActual() instanceof ZonaArrecife){
-                    System.out.println("8) Volver a Nave Estrellada");
-                }
                 System.out.println("0) Salir");
                 System.out.print("> ");
 
@@ -129,23 +131,47 @@ public class Main {
                                 System.out.println("Funcionalidad de gestionar inventario (pendiente).");
                                 break;
                             case 4:
-                                Zona siguienteZona = jugador.getZonaActual().getZonaSiguiente();
-                                if (siguienteZona != null) {
-                                    int minProf = siguienteZona.getProfundidadMin();
-                                    if (jugador.puedeAcceder(minProf) && nave.puedeAcceder(minProf)) {
-                                        jugador.setZonaActual(siguienteZona);
-                                        nave.setZonaActual(siguienteZona);
+                                System.out.println("1) Ir a zona siguiente");
+                                System.out.println("2) Volver a zona anterior");
+                                System.out.print("> ");
+                                int Opcion = Scan.nextInt();
+
+                                
+                                if (Opcion == 1) {
+                                    Zona siguienteZona = jugador.getZonaActual().getZonaSiguiente();
+                                    
+                                    if(siguienteZona != null){
+                                        int minProf = siguienteZona.getProfundidadMin();
+                                        if (jugador.puedeAcceder(minProf) || nave.puedeAcceder(minProf)) {
+                                            jugador.setZonaActual(siguienteZona);
+                                            nave.setZonaActual(siguienteZona);
+                                            nave.setProfundidadAnclaje(minProf);
+                                            jugador.setProfundidadActual(minProf);
+                                            System.out.println("Viajando a " + siguienteZona.nombre + " ...");
+                                            System.out.println("Destino alcanzado. (" + siguienteZona.nombre + ", anclaje="+ minProf + ").\n");
+                                        } else {
+                                            System.out.println("No puedes acceder a esta zona aún (profundidad mínima " + minProf + " m).");
+                                        }
+                                    } else {
+                                        System.out.println("No hay zona siguiente.");
+                                    }
+                                }else if (Opcion == 2) {
+                                    Zona anteriorZona = jugador.getZonaActual().getZonaAnterior();
+                                    if (anteriorZona != null) {
+                                        int minProf = anteriorZona.getProfundidadMin();
+                                        jugador.setZonaActual(anteriorZona);
+                                        nave.setZonaActual(anteriorZona);
                                         nave.setProfundidadAnclaje(minProf);
                                         jugador.setProfundidadActual(minProf);
-                                        System.out.println("Viajando a " + siguienteZona.nombre + " ...");
-                                        System.out.println("Destino alcanzado. (" + siguienteZona.nombre + ", anclaje="+ minProf + ").\n");
+                                        System.out.println("Regresando a " + anteriorZona.nombre + "...");
+                                        System.out.println("=== Has vuelto a " + anteriorZona.nombre + " (anclaje=" + minProf + "). ===");
                                     } else {
-                                        System.out.println("No puedes acceder a esta zona aún (profundidad mínima " + minProf + " m).");
+                                        System.out.println("No hay zona anterior.");
                                     }
                                 } else {
-                                    System.out.println("No hay zona siguiente.");
+                                    System.out.println("Opción inválida.");
                                 }
-                                 break;
+                                break;
                             case 5:
                                 System.out.println("Inventario de la nave (pendiente).");
                                 break;
@@ -169,16 +195,6 @@ public class Main {
 
                     case 7:
                         System.out.println("Inventario (pendiente de implementación): " + jugador.getZonaActual().nombre);
-                        break;
-
-                    case 8:
-                        if (jugador.getZonaActual() instanceof ZonaArrecife) {
-                            jugador.setZonaActual(NaveEstrellada);
-                            jugador.setProfundidadActual(0);
-                            System.out.println("=== Has regresado a la Nave Estrellada ===");
-                        } else {
-                            System.out.println("Opción inválida."); // evita cambiar zona si no corresponde
-                        }
                         break;
                     case 0:
                         System.out.println("Saliendo del juego...");

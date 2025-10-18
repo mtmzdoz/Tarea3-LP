@@ -16,7 +16,7 @@ public class ZonaProfunda extends Zona {
     public ZonaProfunda() {
         super("Zona Profunda", 200, 999, EnumSet.of(ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita));
         this.presion = 10;
-        this.siguienteZona = null;
+        this.ZonaSiguiente = null;
     }
     @Override
     public void explorar(Jugador jugador) {

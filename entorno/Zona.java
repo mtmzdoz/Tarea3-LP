@@ -11,7 +11,8 @@ public abstract class Zona {
     private int profundidadMin;            
     private int profundidadMax;            
     private EnumSet<ItemTipo> recursos;  
-    protected Zona siguienteZona;  
+    protected Zona ZonaSiguiente;  
+    protected Zona ZonaAnterior;
 
     //Constructor
     public Zona(String nombre, int min, int max, EnumSet<ItemTipo> recursosDisponibles) {
@@ -47,9 +48,17 @@ public abstract class Zona {
     } 
     
     public Zona getZonaSiguiente() {
-        return siguienteZona; 
+        return ZonaSiguiente; 
     }
-    public void setZonaSiguiente(Zona siguienteZona) {
-        this.siguienteZona = siguienteZona;
+    public Zona getZonaAnterior() {
+        return ZonaAnterior;
+    }
+
+    //Setter 
+    public void setZonaSiguiente(Zona ZonaSig) {
+        this.ZonaSiguiente = ZonaSig;
+    }
+    public void setZonaAnterior(Zona zonaAnterior) {
+        this.ZonaAnterior = zonaAnterior;
     }
 }
