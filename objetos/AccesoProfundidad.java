@@ -1,11 +1,11 @@
 package objetos;
 
-/**
- * Interfaz que define la capacidad de un objeto de acceder o soportar 
- * una profundidad requerida. [cite: 135]
- */
-public interface AccesoProfundidad {
 
-    //Verifica si el objeto puede acceder o soportar una profundidad dada. [cite: 136]
+public interface AccesoProfundidad{
+    /*
+    * Determina si el objeto puede acceder a una profundidad específica.
+    * @param requerido: int - la profundidad o nivel que se desea alcanzar.
+    * @return boolean - true si el acceso es posible, false si no se cumplen las condiciones.
+    */
     boolean puedeAcceder(int requerido);
 }

@@ -7,116 +7,120 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.Scanner;
 
-
-/**
- * Zona Profunda (200-999 m).
- */
-public class ZonaProfunda extends Zona {
+public class ZonaProfunda extends Zona{
     
     private int presion;
     private Random rand;
 
-    public ZonaProfunda() {
+    /*
+    * Constructor de la Zona Profunda. Inicializa los valores de presión, recursos disponibles, el generador aleatorio, rango de profundidad y zona siguiente.
+    * @param Ninguno
+    * @return void
+    */
+    public ZonaProfunda(){
         super("Zona Profunda", 200, 999, EnumSet.of(ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita));
         this.presion = 10;
         this.ZonaSiguiente = null;
         this.rand= new Random();
     }
-    public void recolectar(Jugador jugador, Scanner scan) {
-       System.out.println("⛏️ Recolectando recursos en la Zona Profunda...");
 
-        int z = jugador.getProfundidadActual();
-        double d = calcularProfundidadNormalizada(z);
+    /*
+    * Permite al jugador recolectar recursos dentro de la Zona Profunda. Calcula el consumo de oxígeno, la cantidad obtenida y agrega los ítems al inventario.
+    * @param jugador: Jugador - jugador que realiza la acción de recolección.
+    * @param scan: Scanner - objeto usado para capturar la elección de recurso.
+    * @return void
+    */
+    public void recolectar(Jugador jugador, Scanner scan){
+        System.out.println("\nRecolectando recursos en la Zona Profunda...");
+
+        int ProfundidadJugador = jugador.getProfundidadActual();
+        double d = ProfundidadNormalizada(ProfundidadJugador);
         double pres = jugador.getMejoraTanque() ? 0 : calcularPresion(jugador);
 
-        // 1️⃣ Calcular costo de oxígeno
         int Crecolectar = (int) Math.ceil(10 + 6 * d + pres);
         jugador.getTanqueOxigeno().consumirO2(Crecolectar);
-        System.out.println("💨 Consumo de O₂ por recolectar: " + Crecolectar);
+        System.out.println("Consumo de oxígeno por recolectar: " + Crecolectar);
 
-        // 2️⃣ Verificar si murió por falta de O₂
-        if (jugador.getTanqueOxigeno().getOxigenoRestante() <= 0) {
+        if (jugador.getTanqueOxigeno().getOxigenoRestante() <= 0){
             jugador.derrotaPorOxigeno();
             return;
         }
 
-        // 3️⃣ Mostrar opciones de recursos
-        System.out.println("\n🌋 ¿Qué recurso deseas recolectar?");
-        ItemTipo[] recursos = {ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita};
+        System.out.println("¿Qué recurso deseas recolectar?");
+        ItemTipo[] Recursos = {ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante, ItemTipo.Magnetita};
 
-        for (int i = 0; i < recursos.length; i++) {
-            System.out.println((i + 1) + ") " + recursos[i]);
+        for (int i = 0; i < Recursos.length; i++){
+            System.out.println((i + 1) + ") " + Recursos[i]);
         }
         System.out.print("> ");
-        int opcion = scan.nextInt();
+        int Opcion = scan.nextInt();
 
-        // 4️⃣ Validar elección
-        if (opcion < 1 || opcion > recursos.length) {
-            System.out.println("❌ Opción inválida. Cancelando recolección.");
+        if (Opcion < 1 || Opcion > Recursos.length){
+            System.out.println("Opción inválida. Cancelando recolección.");
             return;
         }
 
-        ItemTipo recursoElegido = recursos[opcion - 1];
+        ItemTipo RecursoElegido = Recursos[Opcion - 1];
 
-        // 5️⃣ Calcular cantidad obtenida con la fórmula n(d) = max(1, floor(n_min * d))
-        int n_min = 2; 
-        int n_max = 6;
-        int cantidad =  Math.max(1, (int) Math.floor(n_min + (n_max - n_min) * d));
+        int n_min = 2, n_max = 6;
+        int Cantidad =  Math.max(1, (int) Math.floor(n_min + (n_max - n_min) * d));
 
-        // 6️⃣ Entregar recurso al jugador
-        jugador.agregarItem(new Item(recursoElegido, cantidad));
-        System.out.println("🔹 Has recolectado: " + cantidad + " x " + recursoElegido);
+        jugador.agregarItem(new Item(RecursoElegido, Cantidad));
+        System.out.println("Has recolectado: " + Cantidad + " x " + RecursoElegido);
 
     }
+
+    /*
+    * Permite al jugador explorar la Zona Profunda en busca de recompensas. Consume oxígeno proporcional a la profundidad y puede otorgar ítems aleatorios.
+    * @param jugador: Jugador - jugador que realiza la exploración.
+    * @return void
+    */
     @Override
     public void explorar(Jugador jugador) {
-        int z = jugador.getProfundidadActual();
-        double d = calcularProfundidadNormalizada(z);
+        System.out.println("Explorando la Zona Profunda... ");
 
-        // Presión
+        int z = jugador.getProfundidadActual();
+        double d = ProfundidadNormalizada(z);
         double pres = jugador.getMejoraTanque() ? 0 : calcularPresion(jugador);
 
-        // Calcular costo de oxígeno para explorar
         int Cexplorar = (int) Math.ceil(12 + 10 * d + pres);
         jugador.getTanqueOxigeno().consumirO2(Cexplorar);
-        System.out.println("💨 Consumo de O₂ por explorar: " + Cexplorar);
+        System.out.println("Consumo de oxígeno por explorar: " + Cexplorar);
 
-        // Verificar si murió por falta de O₂
-        if (jugador.getTanqueOxigeno().getOxigenoRestante() <= 0) {
+        if (jugador.getTanqueOxigeno().getOxigenoRestante() <= 0){
             jugador.derrotaPorOxigeno();
             return;
         }
-
-        // Si no hay objeto de progresión → recurso aleatorio
         otorgarRecompensa(jugador, d);
-        
-
     }
 
-    private void otorgarRecompensa(Jugador jugador, double d) {
-        // Recursos disponibles
-        ItemTipo[] recursos = { ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante,ItemTipo.Magnetita};
+    /*
+    * Otorga una recompensa aleatoria al jugador después de explorar la zona. El recurso obtenido depende de la profundidad normalizada.
+    * @param jugador: Jugador - jugador que recibe la recompensa.
+    * @param d: double - profundidad normalizada (0 a 1) que afecta la cantidad.
+    * @return void
+    */
+    private void otorgarRecompensa(Jugador jugador, double d){
+        ItemTipo[] Recursos = { ItemTipo.Plata, ItemTipo.Oro, ItemTipo.Acero, ItemTipo.Diamante,ItemTipo.Magnetita};
 
-        // Cantidad según la fórmula: max(1, floor(n_min * d))
-        int n_min = 2; // más alto que en zonas superficiales
-        int cantidad = Math.max(1, (int) Math.floor(n_min * d));
+        int n_min = 2; 
+        int Cantidad = Math.max(1, (int) Math.floor(n_min * d));
+        ItemTipo Recurso = Recursos[rand.nextInt(Recursos.length)];
 
-        // Seleccionar recurso aleatorio
-        ItemTipo recurso = recursos[rand.nextInt(recursos.length)];
-
-        jugador.agregarItem(new Item(recurso, cantidad));
-        System.out.println("🔹 Has obtenido " + cantidad + " x " + recurso);
+        jugador.agregarItem(new Item(Recurso, Cantidad));
+        System.out.println("Has obtenido " + Cantidad + " x " + Recurso+ "\n");
     }
 
-    public double calcularPresion(Jugador jugador) {
+    /*
+    * Calcula la presión que afecta al jugador dentro de la Zona Profunda. Si el jugador tiene la mejora del tanque, la presión se anula.
+    * @param jugador: Jugador - jugador actual para calcular su presión.
+    * @return double - valor de la presión resultante en función de la profundidad.
+    */
+    public double calcularPresion(Jugador jugador){
         if (jugador.getMejoraTanque()) {
             return 0;
         }
-        // Calcula profundidad normalizada d (0 a 1)
-        double d = calcularProfundidadNormalizada(jugador.getProfundidadActual());
-        return presion + 6 * d; // fórmula de presión para ZonaProfunda
+        double d = ProfundidadNormalizada(jugador.getProfundidadActual());
+        return presion + 6 * d; // fórmula de presión en prfunda
     }
-
-   
-    
 }

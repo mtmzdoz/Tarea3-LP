@@ -1,4 +1,3 @@
-// Archivo: entorno/NaveEstrellada.java
 package entorno;
 import player.Jugador;
 import objetos.Item;
@@ -7,115 +6,129 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.Scanner;
 
-public class NaveEstrellada extends Zona {
+public class NaveEstrellada extends Zona{
     private boolean moduloEncontrado; 
     private Random rand;
-    private int accionesSinTraje;
+    private int AccionesSinTraje;
 
-    public NaveEstrellada() {
+    /*
+    * Constructor de la Nave Estrellada. Inicializa los recursos disponibles, rango de profundidad, el generador 
+    * aleatorio, modulo de profundidad y las acciones posibes sin traje térmico.
+    * @param Ninguno
+    * @return void
+    */
+    public NaveEstrellada(){
         super("Nave Estrellada", 0, 0, EnumSet.noneOf(ItemTipo.class)); 
         this.moduloEncontrado = false;
         this.rand = new Random();
-        this.accionesSinTraje = 0;
-    }
-    
-    public void recolectar(Jugador jugador, Scanner scan) {
-        System.out.println("🧰 Intentando recolectar en la Nave Estrellada...");
-
-        double d = calcularProfundidadNormalizada(jugador.getProfundidadActual());
-        int n_min = 1;
-        int n_max = 4;
-        int cantidad = Math.max(1, (int) Math.floor(n_min + (n_max - n_min) * d));
-
-        ItemTipo[] recursos = { ItemTipo.Cables, ItemTipo.Piezas_Metal };
-        ItemTipo recurso = recursos[rand.nextInt(recursos.length)];
-
-        jugador.agregarItem(new Item(recurso, cantidad));
-        System.out.println("🔩 Has recolectado: " + cantidad + " x " + recurso);
-
-        if (!jugador.isTrajeTermico()) {
-            accionesSinTraje++;
-            if (accionesSinTraje == 1) {
-                // Segunda vez: advertencia y riesgo de muerte
-                System.out.println("\n🥵 El calor dentro de la nave es insoportable sin traje térmico...");
-                System.out.println("Si vuelves a intentar recolectar, morirás por sofocación.");
-                System.out.println("Te recomiendo salir de la nave o crear el traje térmico antes de continuar.");
-                accionesSinTraje++; // Marca que ya se advirtió
-             
-            } else if (accionesSinTraje > 1) {
-                // Tercer intento o más → muerte
-                System.out.println("💀 Has ignorado el calor... ¡Has sucumbido a la sofocación!");
-                jugador.derrotaPorSofocacion();
-                return;
-            }
-        }
-        
+        this.AccionesSinTraje = 0;
     }
 
-    
+    /*
+    * Permite al jugador recolectar recursos dentro de la Nave Estrellada. Calcula la cantidad recolectada y aplica penalización por calor si no posee traje térmico.
+    * @param jugador: Jugador - jugador que realiza la recolección.
+    * @param scan: Scanner - entrada usada para seleccionar el tipo de recurso.
+    * @return void
+    */
+    public void recolectar(Jugador jugador, Scanner scan){
+        System.out.println("Recolectando recursos en la Nave Estrellada...");
 
+        double d = ProfundidadNormalizada(jugador.getProfundidadActual());
+        int n_min = 1, n_max = 4;
+        int Cantidad = Math.max(1, (int) Math.floor(n_min + (n_max - n_min) * d));
 
-    @Override
-    public void explorar(Jugador jugador) {
-        System.out.println("🚀 Explorando el interior de la Nave Estrellada...");
-
-        // 1️⃣ No hay consumo de oxígeno
-        // 2️⃣ Sofocación: sin traje térmico, máximo 1 acción
-        if (!jugador.isTrajeTermico()) {
-            
-            accionesSinTraje++;
-            if (accionesSinTraje == 1) {
-                // Segunda vez: advertencia y riesgo de muerte
-                System.out.println("\n🥵 El calor dentro de la nave es insoportable sin traje térmico...");
-                System.out.println("Si vuelves a intentar explorar o recolectar, morirás por sofocación.");
-                System.out.println("Te recomiendo salir de la nave o crear el traje térmico antes de continuar.");
-                accionesSinTraje++; // Marca que ya se advirtió
-             
-            } else if (accionesSinTraje > 1) {
-                // Tercer intento o más → muerte
-                System.out.println("💀 Has ignorado el calor... ¡Has sucumbido a la sofocación!");
-                jugador.derrotaPorSofocacion();
-                return;
-            }
+        ItemTipo[] Recursos = { ItemTipo.Cables, ItemTipo.Piezas_Metal };
+        System.out.println("¿Qué recurso deseas recolectar?");
+        for (int i = 0; i < Recursos.length; i++){
+            System.out.println((i + 1) + ") " + Recursos[i]);
         }
 
-        if (!(jugador.getZonaActual() instanceof NaveEstrellada)) {
+        System.out.print("> ");
+        int Opcion = scan.nextInt();
+
+        if (Opcion < 1 || Opcion > Recursos.length){
+            System.out.println("Opción inválida. Cancelando recolección.");
             return;
         }
 
-        double randVal = rand.nextDouble();
-        System.out.println("🎲 Probabilidad generada: " + randVal);
+        ItemTipo RecursoElegido = Recursos[Opcion - 1];
+        jugador.agregarItem(new Item(RecursoElegido, Cantidad));
+        System.out.println("Has recolectado: " + Cantidad + " x " + RecursoElegido);
 
+        if (!jugador.isTrajeTermico()){
+            AccionesSinTraje++;
+            if (AccionesSinTraje == 1){
+                System.out.println("El calor dentro de la nave es insoportable sin traje térmico...");
+                System.out.println("Si vuelves a intentar explorar o recolectar, morirás por sofocación.");
+                System.out.println("Te recomiendo volver a la Nave Exploradora o crear el traje térmico antes de continuar.");
+                AccionesSinTraje++; 
 
-        // 3️⃣ Posibilidad de hallar el módulo de profundidad (único, 25%)
-        if (!moduloEncontrado && randVal < 0.25) {
-            System.out.println("⚙️ ¡Has encontrado el MODULO_PROFUNDIDAD!");
+            }else if(AccionesSinTraje > 1){
+                System.out.println("Has ignorado el calor... ¡Has sucumbido a la sofocación!");
+                jugador.derrotaPorSofocacion();
+                return;
+            }
+        }
+    }
+
+    /*
+    * Permite al jugador explorar la Nave Estrellada en busca de componentes raros. Puede otorgar el Módulo de Profundidad y castigar la falta de traje térmico.
+    * @param jugador: Jugador - jugador que realiza la exploración.
+    * @return void
+    */
+    @Override
+    public void explorar(Jugador jugador){
+        System.out.println("\nExplorando el interior de la Nave Estrellada...");
+
+        if (!jugador.isTrajeTermico()){
+            AccionesSinTraje++;
+            if (AccionesSinTraje == 1){
+                System.out.println("El calor dentro de la nave es insoportable sin traje térmico...");
+                System.out.println("Si vuelves a intentar explorar o recolectar, morirás por sofocación.");
+                System.out.println("Te recomiendo volver a la Nave Exploradora o crear el traje térmico antes de continuar.");
+                AccionesSinTraje++; 
+
+            }else if(AccionesSinTraje > 1){
+                System.out.println("Has ignorado el calor... ¡Has sucumbido a la sofocación!");
+                jugador.derrotaPorSofocacion();
+                return;
+            }
+        }
+
+        if (!(jugador.getZonaActual() instanceof NaveEstrellada)){
+            return;
+        }
+
+        if (!moduloEncontrado && rand.nextDouble() < 0.25){
+            System.out.println("¡Has encontrado el Módulo de Profundidad!");
             jugador.agregarItem(new Item(ItemTipo.MODULO_PROFUNDIDAD, 1));
             moduloEncontrado = true;
             return;
         }
 
-        //Recompensas si no se encontro el traje
-        double d = calcularProfundidadNormalizada(jugador.getProfundidadActual());
+        double d = ProfundidadNormalizada(jugador.getProfundidadActual());
         int n_min = 1;
-        int cantidad = Math.max(1, (int) Math.floor(n_min * d));
+        int Cantidad = Math.max(1, (int) Math.floor(n_min * d));
 
-        // 🔹 Como d = 0 en esta zona, aseguramos que al menos obtenga 1 recurso
-        if (cantidad < 1){ 
-            cantidad = 1;
+        if (Cantidad < 1){ 
+            Cantidad = 1;
         }
-        // 🔹 Seleccionar recurso aleatorio
-        ItemTipo[] recursos = { ItemTipo.Cables, ItemTipo.Piezas_Metal };
-        ItemTipo recurso = recursos[rand.nextInt(recursos.length)];
+     
+        ItemTipo[] Recursos = { ItemTipo.Cables, ItemTipo.Piezas_Metal };
+        ItemTipo Recurso = Recursos[rand.nextInt(Recursos.length)];
 
-        jugador.agregarItem(new Item(recurso, cantidad));
-        System.out.println("🔩 Has recolectado: " + cantidad + " x " + recurso);
-
-
+        jugador.agregarItem(new Item(Recurso, Cantidad));
+        System.out.println("Has recolectado: " + Cantidad + " x " + Recurso + "\n");
     }
 
-    public void resetearAccionesSinTraje() {
-        this.accionesSinTraje = 0;
+    /*
+    * Reinicia el contador de acciones peligrosas realizadas sin traje térmico.
+    * Se llama normalmente al cambiar de zona o reaparecer.
+    * @param Ninguno
+    * @return void
+    */
+    public void resetearAccionesSinTraje(){
+        this.AccionesSinTraje = 0;
     }
 
 

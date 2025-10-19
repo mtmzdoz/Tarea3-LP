@@ -12,12 +12,7 @@ import entorno.Zona;
 import entorno.ZonaProfunda;
 import entorno.ZonaVolcanica;
 
-
-
-/**
- * Clase que representa al jugador. Implementa AccesoProfundidad.
- */
-public class Jugador implements AccesoProfundidad {
+public class Jugador implements AccesoProfundidad{
     
     //Del diagrama
     private Oxigeno tanqueOxigeno;             
@@ -30,8 +25,13 @@ public class Jugador implements AccesoProfundidad {
     private boolean mejoraTanque;   
     private boolean enNave = false;           
 
-    //Constructor
-    public Jugador(NaveExploradora naveInicial, Zona zonaInicial) {
+    /*
+    * Constructor del jugador. Inicializa los valores base de oxígeno, inventario, zona, nave y mejoras posibñes.
+    * @param naveInicial: NaveExploradora - la nave con la que comienza el jugador.
+    * @param zonaInicial: Zona - la zona inicial donde se ubica el jugador.
+    * @return void
+    */
+    public Jugador(NaveExploradora naveInicial, Zona zonaInicial){
         this.tanqueOxigeno = new Oxigeno();
         this.inventario = new ArrayList<>();
         this.nave = naveInicial;
@@ -42,58 +42,56 @@ public class Jugador implements AccesoProfundidad {
         this.mejoraTanque = false;
     }
 
-    //Del diagrama
+    /*
+    * Determina si el jugador puede acceder a una profundidad específica 
+    * @param requerido: int - la profundidad requerida o destino.
+    * @return boolean - true si puede acceder, false si no cumple los requisitos.
+    */
     @Override
-    public boolean puedeAcceder(int requerido) {
+    public boolean puedeAcceder(int requerido){
         Zona zona = this.zonaActual;
-
-        // No puede entrar a zonas volcánicas sin traje térmico
-        if (zona instanceof ZonaVolcanica && !trajeTermico) {
-            System.out.println("⚠️ No puedes acceder a la Zona Volcánica sin el traje térmico.");
+        if (zona instanceof ZonaVolcanica && !trajeTermico){
+            System.out.println("No puedes acceder a la Zona Volcánica sin el traje térmico.");
             return false;
         }
-        if (requerido > 500 && !nave.puedeAcceder(requerido)) {
-            System.out.println("⚠️ No puedes acceder más allá de 500 m sin el módulo de profundidad instalado en la nave.");
-            return false;
-        }
-
-        // Sin mejora, solo puede llegar hasta 500 m (igual que la nave sin módulo)
+    
         return true;
-        
     }
 
-    //Del diagrama
-    public void verEstadoJugador() {
+    /*
+    * Muestra el estado actual del jugador en consola: zona, oxígeno y profundidad.
+    * @param Ninguno
+    * @return void
+    */
+    public void verEstadoJugador(){
         System.out.println("Zona Actual: " + zonaActual.nombre + " | O2: " + tanqueOxigeno.getOxigenoRestante() + " | Profundidad: " + profundidadActual + "m");
     }
 
-    public void nadar(int delta) {
+    /*
+    * Permite al jugador nadar hacia una nueva profundidad dentro de la zona actual.
+    * Consume oxígeno proporcional a la distancia y presión.
+    * @param delta: int - diferencia entre la profundidad actual y la deseada.
+    * @return void
+    */
+    public void nadar(int delta){
         Zona zona = this.getZonaActual();
         int profundidadInicial = this.profundidadActual;
         int destino = this.profundidadActual + delta;
 
-        if (destino < zona.getProfundidadMin() || destino > zona.getProfundidadMax()) {
-            System.out.println("⚠️ No puedes nadar fuera del rango de esta zona (" + zona.getProfundidadMin() + " - " + zona.getProfundidadMax() + " m).");
+        if (destino < zona.getProfundidadMin() || destino > zona.getProfundidadMax()){
+            System.out.println("No puedes nadar fuera del rango de esta zona (" + zona.getProfundidadMin() + " - " + zona.getProfundidadMax() + " m).");
             return;
         }
 
-        // ⚠️ Solo limitamos si es una ZonaVolcanica sin traje térmico
-        if (zona instanceof ZonaVolcanica && !trajeTermico) {
-            System.out.println("⚠️ No puedes nadar en la Zona Volcánica sin el traje térmico.");
-            return;
-        }
-
-
-        // Profundidad normalizada
-        double d = zona.calcularProfundidadNormalizada(profundidadInicial);
+        double d = zona.ProfundidadNormalizada(profundidadInicial);
         int distanciaRecorrida = Math.abs(destino - profundidadInicial);
 
         double presion = 0;
-        if (!this.mejoraTanque) {
-            if (zona instanceof ZonaProfunda) {
+        if (!this.mejoraTanque){
+            if (zona instanceof ZonaProfunda){
                 presion = ((ZonaProfunda) zona).calcularPresion(this); // devuelve 10 + 6*d
-            } else if (zona instanceof ZonaVolcanica) {
-                System.out.println("⚠️ No se puede descender a Zona Volcánica sin el módulo de profundidad!");
+            }else if (zona instanceof ZonaVolcanica){
+                System.out.println("No se puede descender a la Zona Volcánica sin el módulo de profundidad");
                 return;
             }
         }
@@ -101,61 +99,79 @@ public class Jugador implements AccesoProfundidad {
         int Cmover = (int) Math.ceil((3 + 3*d) * Math.abs(distanciaRecorrida) / 50.0 );
         this.tanqueOxigeno.consumirO2(Cmover);
 
-        if (this.getTanqueOxigeno().getOxigenoRestante() <= 0) {
+        if (this.getTanqueOxigeno().getOxigenoRestante() <= 0){
             this.derrotaPorOxigeno();
-            return; // interrumpe la función inmediatamente
+            return;
         }
 
-        // Actualizar profundidad
         this.setProfundidadActual(destino);
-
-        System.out.println("Te moviste a " + destino + " m. Presión:" + presion + " | Oxígeno consumido: " + Cmover + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante());
+        System.out.println("\nTe moviste a " + destino + " m. Presión:" + presion + " | Oxígeno consumido: " + Cmover + ". Oxígeno restante: " + this.tanqueOxigeno.getOxigenoRestante()+"\n");
     }
     
-    
-    public void agregarItem(Item nuevo) {
-        if (nuevo == null) return;
-        for (Item it : inventario) {
-            if (it.getTipo() == nuevo.getTipo()) {
-                it.setCantidad(it.getCantidad() + nuevo.getCantidad());
-                System.out.println("🎒 Sumado: " + nuevo.getCantidad() + " x " + it.getTipo() + " (total: " + it.getCantidad() + ")");
+    /*
+    * Agrega un nuevo ítem al inventario del jugador o incrementa su cantidad si ya existe.
+    * @param nuevo: Item - el ítem a agregar.
+    * @return void
+    */
+    public void agregarItem(Item nuevo){
+        if (nuevo == null){
+            return;
+        }
+        for (Item item: inventario){
+            if (item.getTipo() == nuevo.getTipo()){
+                item.setCantidad(item.getCantidad() + nuevo.getCantidad());
+                System.out.println("Sumado: " + nuevo.getCantidad() + " x " + item.getTipo() + " (total: " + item.getCantidad() + ")\n");
                 return;
             }
         }
         inventario.add(nuevo);
-        System.out.println("🎒 Agregado: " + nuevo.getCantidad() + " x " + nuevo.getTipo());
+        System.out.println("Agregado: " + nuevo.getCantidad() + " x " + nuevo.getTipo() );
     }
 
-    public void removerItem(ItemTipo tipo, int cantidad) {
-        for (int i = 0; i < inventario.size(); i++) {
+    /*
+    * Elimina una cantidad específica de un tipo de ítem del inventario. Si la cantidad llega a cero, se remueve completamente.
+    * @param tipo: ItemTipo - tipo de ítem a remover.
+    * @param cantidad: int - cantidad a eliminar.
+    * @return void
+    */
+    public void removerItem(ItemTipo tipo, int cantidad){
+        for (int i = 0; i < inventario.size(); i++){
             Item item = inventario.get(i);
-            if (item.getTipo() == tipo) {
+            if (item.getTipo() == tipo){
                 item.setCantidad(item.getCantidad() - cantidad);
-                if (item.getCantidad() <= 0) inventario.remove(i);
-                return;
+                if (item.getCantidad() <= 0) inventario.remove(i);{
+                    return;
+                }
             }
         }
     }
 
-    public void verInventario() {
-        if (inventario.isEmpty()) {
-            System.out.println("🎒 Tu inventario está vacío.");
+    /*
+    * Muestra en consola todos los ítems actuales del inventario del jugador.
+    * @param Ninguno
+    * @return void
+    */
+    public void verInventario(){
+        if (inventario.isEmpty()){
+            System.out.println("\n--- Tu inventario está vacío. --- \n");
             return;
         }
 
-        System.out.println("=== 🎒 Inventario del jugador ===");
-        for (Item item : inventario) {
+        System.out.println("\n=== Inventario del jugador ===");
+        for (Item item : inventario){
             System.out.println("- " + item.getTipo() + " x" + item.getCantidad());
         }
+        System.out.println();
     }
 
-    
-
-
-    public void derrotaPorOxigeno() {
-        System.out.println("\n💀 ¡Te has quedado sin oxígeno!");
-        System.out.println("Pierdes todo tu inventario y reapareces en la nave...\n");
-
+    /*
+    * Maneja la derrota del jugador por falta de oxígeno, reiniciando su estado y posición.
+    * @param Ninguno
+    * @return void
+    */
+    public void derrotaPorOxigeno(){
+        System.out.println("¡Te has quedado sin oxígeno!");
+        System.out.println("Pierdes todo tu inventario y reapareces en la Nave Exploradora...");
         inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD && item.getTipo() != ItemTipo.PLANO_NAVE);
 
         // Reaparecer en la nave
@@ -164,15 +180,18 @@ public class Jugador implements AccesoProfundidad {
         this.tanqueOxigeno.recargarCompleto();
         this.enNave = true;
         nave.entrar(this);
-
         nave.MenuNave(this, new Scanner(System.in));
         
     }
 
-    public void derrotaPorSofocacion() {
-        System.out.println("\n🥵 ¡Has sucumbido al calor extremo dentro de la nave!");
-        System.out.println("Pierdes todo tu inventario y reapareces en la Nave Exploradora...\n");
-
+    /*
+    * Maneja la derrota del jugador por sofocación dentro de la nave.
+    * @param Ninguno
+    * @return void
+    */
+    public void derrotaPorSofocacion(){
+        System.out.println("¡Has sucumbido al calor dentro de la nave!");
+        System.out.println("Pierdes todo tu inventario y reapareces en la Nave Exploradora...");
         inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD && item.getTipo() != ItemTipo.PLANO_NAVE);
 
         this.zonaActual = nave.getZonaActual(); 
@@ -184,77 +203,175 @@ public class Jugador implements AccesoProfundidad {
             naveEstrellada.resetearAccionesSinTraje();
         }
         nave.entrar(this);
-
         nave.MenuNave(this, new Scanner(System.in));
     }
 
+    /*
+    * Maneja el evento donde el jugador pierde la consciencia por calor extremo.
+    * Reinicia su estado y posición.
+    * @param Ninguno
+    * @return void
+    */
     public void perdidaConciencia(){
-        System.out.println("\n💫 El calor y los gases te abruman... ¡pierdes la consciencia!");
-            System.out.println("Cuando despiertas, estás de vuelta en la nave... pero has perdido tu inventario.");
-
+        System.out.println("El calor te abruman... ¡pierdes la consciencia!");
+        System.out.println("Despiertas nuevamente en la Nave Exploradora... pero has perdido tu inventario.");
         inventario.removeIf(item -> item.getTipo() != ItemTipo.PIEZA_TANQUE  && item.getTipo() != ItemTipo.MODULO_PROFUNDIDAD && item.getTipo() != ItemTipo.PLANO_NAVE);
 
-        // Reaparecer en la nave
         this.zonaActual = nave.getZonaActual(); 
         this.profundidadActual = nave.getProfundidadAnclaje();
         this.tanqueOxigeno.recargarCompleto();
         this.enNave = true;
         nave.entrar(this);
-
         nave.MenuNave(this, new Scanner(System.in));
     }
 
-    // Getters y Setters
+    // Getter
+    /*
+    * Retorna el tanque de oxígeno del jugador.
+    * @param Ninguno
+    * @return Oxigeno - instancia del tanque de oxígeno.
+    */
     public Oxigeno getTanqueOxigeno(){
         return tanqueOxigeno; 
     }
-    public boolean getMejoraTanque() {
+
+    /*
+    * Indica si el jugador posee la mejora del tanque de oxígeno.
+    * @param Ninguno
+    * @return boolean - true si tiene la mejora, false en caso contrario.
+    */
+    public boolean getMejoraTanque(){
         return mejoraTanque; 
     }
-    public Zona getZonaActual() {
+
+    /*
+    * Obtiene la zona actual donde se encuentra el jugador.
+    * @param Ninguno
+    * @return Zona - zona actual.
+    */
+    public Zona getZonaActual(){
         return zonaActual;
     }
+
+     /*
+    * Devuelve la profundidad actual del jugador.
+    * @param Ninguno
+    * @return int - profundidad actual en metros.
+    */
     public int getProfundidadActual(){
         return profundidadActual; 
     }
+
+     /*
+    * Retorna la nave exploradora asociada al jugador.
+    * @param Ninguno
+    * @return NaveExploradora - nave actual del jugador.
+    */
     public NaveExploradora getNave(){ 
         return nave; 
     }
-    public boolean isEnNave() {
+
+    /*
+    * Indica si el jugador se encuentra actualmente dentro de la nave.
+    * @param Ninguno
+    * @return boolean - true si está en la nave, false si está fuera.
+    */
+    public boolean isEnNave(){
         return enNave;
     }
-    public List<Item> getInventario() {
+
+    /*
+    * Retorna el inventario completo del jugador.
+    * @param Ninguno
+    * @return List<Item> - lista de ítems del jugador.
+    */
+    public List<Item> getInventario(){
         return inventario;
     }
-    // --- Traje térmico ---
-    public boolean isTrajeTermico() {
+
+    /*
+    * Indica si el jugador tiene equipado el traje térmico.
+    * @param Ninguno
+    * @return boolean - true si posee el traje térmico, false si no.
+    */
+    public boolean isTrajeTermico(){
         return trajeTermico;
     }
 
-    
+    /*
+    * Indica si el jugador posee los planos de la nave estrellada.
+    * @param Ninguno
+    * @return boolean - true si tiene los planos, false si no.
+    */
+    public boolean getTienePlanos(){
+        return tienePlanos;
+    }
 
-
-    public void setZonaActual(Zona zonaActual) { 
+    //Setter
+    /*
+    * Asigna una nueva zona al jugador. Si la zona es una nave estrellada, resetea sus acciones sin traje.
+    * @param zonaActual: Zona - nueva zona a establecer.
+    * @return void
+    */
+    public void setZonaActual(Zona zonaActual){ 
         this.zonaActual = zonaActual;
         //Desde o A nave estrellada resetamos por si acaso
-        if (zonaActual instanceof NaveEstrellada naveEstrellada) {
+        if (zonaActual instanceof NaveEstrellada naveEstrellada){
             naveEstrellada.resetearAccionesSinTraje();
         }
     }
-    public void setProfundidadActual(int profundidadActual) { 
+
+    /*
+    * Define la nueva profundidad actual del jugador.
+    * @param profundidadActual: int - nueva profundidad.
+    * @return void
+    */
+    public void setProfundidadActual(int profundidadActual){ 
         this.profundidadActual = profundidadActual; 
     }
+
+    /*
+    * Cambia el estado de si el jugador está o no dentro de la nave.
+    * @param enNave: boolean - true si está en la nave, false si está fuera.
+    * @return void
+    */
     public void setEnNave(boolean enNave) {
         this.enNave = enNave;
     }
-    public void setTanqueOxigeno(Oxigeno nuevoTanque) {
+
+    /*
+    * Establece un nuevo tanque de oxígeno para el jugador.
+    * @param nuevoTanque: Oxigeno - tanque a asignar.
+    * @return void
+    */
+    public void setTanqueOxigeno(Oxigeno nuevoTanque){
         this.tanqueOxigeno = nuevoTanque;
     }
 
-    public void setMejoraTanque(boolean mejoraTanque) {
+    /*
+    * Activa o desactiva la mejora del tanque de oxígeno.
+    * @param mejoraTanque: boolean - true para activar, false para desactivar.
+    * @return void
+    */
+    public void setMejoraTanque(boolean mejoraTanque){
         this.mejoraTanque = mejoraTanque;
     }
-    public void setTrajeTermico(boolean trajeTermico) {
+
+    /*
+    * Activa o desactiva el uso del traje térmico del jugador.
+    * @param trajeTermico: boolean - true si el jugador tiene el traje térmico.
+    * @return void
+    */
+    public void setTrajeTermico(boolean trajeTermico){
         this.trajeTermico = trajeTermico;
+    }
+
+     /*
+    * Define si el jugador posee los planos de la nave.
+    * @param tienePlanos: boolean - true si los posee, false si no.
+    * @return void
+    */
+    public void setTienePlanos(boolean tienePlanos){
+        this.tienePlanos = tienePlanos;
     }
 }
